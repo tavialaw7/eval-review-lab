@@ -124,5 +124,6 @@ function renderCases() {
 for (const id of ["outcome", "category", "split"]) get(id).addEventListener("change", renderCases);
 const kappa = overall.cohens_kappa;
 const pValue = overall.paired_p_value;
-get("method").textContent = `Cohen’s κ ${kappa === null ? "unavailable for these ratings" : kappa.toFixed(2)} · Exact McNemar p ${pValue < 0.001 ? "< 0.001" : pValue.toFixed(3)}`;
+const [ciLow, ciHigh] = overall.delta_ci_pp;
+get("method").textContent = `Change 95% CI ${ciLow.toFixed(1)} to ${ciHigh.toFixed(1)} pp · Cohen’s κ ${kappa === null ? "unavailable for these ratings" : kappa.toFixed(2)} · Exact McNemar p ${pValue < 0.001 ? "< 0.001" : pValue.toFixed(3)}`;
 renderCases();

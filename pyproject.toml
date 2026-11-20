@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eval-review-lab"
+version = "0.1.0"
+description = "Paired LLM evaluation with reviewer QC, regression detection and a CI release gate."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Tavia" }]
+
+[project.scripts]
+eval-review = "eval_review.__main__:main"
+
+[tool.setuptools]
+packages = ["eval_review"]
+
+[tool.setuptools.package-data]
+eval_review = ["assets/*"]

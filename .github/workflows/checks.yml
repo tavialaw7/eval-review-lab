@@ -27,3 +27,11 @@ jobs:
           test "$status" -eq 1
           test -s build/index.html
           test -s build/report.json
+      - name: Verify the published demo matches the generator
+        run: |
+          python -m eval_review data/example.jsonl --output-dir /tmp/fresh
+          cmp /tmp/fresh/index.html docs/index.html
+      - name: Verify the package installs and exposes the CLI
+        run: |
+          pip install .
+          eval-review data/example.jsonl --output-dir /tmp/pkg

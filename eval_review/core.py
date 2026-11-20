@@ -131,6 +131,14 @@ def paired_p_value(improvements, regressions):
     return min(1.0, 2 * tail)
 
 
+def delta_interval(count, improvements, regressions, z=1.96):
+    """Wald 95% interval (in percentage points) for the paired pass-rate change."""
+    change = improvements - regressions
+    variance = (improvements + regressions - change**2 / count) / count**2
+    half = z * math.sqrt(max(variance, 0.0))
+    return [100 * (change / count - half), 100 * (change / count + half)]
+
+
 def summarize(rows):
     count = len(rows)
     baseline = sum(row["baseline_pass"] for row in rows)
@@ -178,6 +186,7 @@ def evaluate(cases, max_regressions, min_delta_pp):
             **overall,
             "cohens_kappa": kappa(contingency) if len(reviewer_pairs) == 1 else None,
             "paired_p_value": paired_p_value(overall["improvements"], overall["regressions"]),
+            "delta_ci_pp": delta_interval(overall["cases"], overall["improvements"], overall["regressions"]),
         },
         "categories": {name: summarize(categories[name]) for name in sorted(categories)},
         "gate": {

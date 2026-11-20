@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from eval_review.core import InputError, evaluate, kappa, paired_p_value, read_cases
+from eval_review.core import InputError, delta_interval, evaluate, kappa, paired_p_value, read_cases
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "data" / "example.jsonl"
@@ -64,6 +64,12 @@ class InputTests(unittest.TestCase):
             data.write_text("\n".join(records), encoding="utf-8")
             with self.assertRaisesRegex(InputError, pattern):
                 read_cases(data)
+
+    def test_delta_interval_matches_paired_wald_formula(self):
+        low, high = delta_interval(24, 9, 4)
+        self.assertAlmostEqual(low, -7.41, places=1)
+        self.assertAlmostEqual(high, 49.07, places=1)
+        self.assertEqual(delta_interval(10, 0, 0), [0.0, 0.0])
 
     def test_duplicate_case_reports_exact_line(self):
         item = json.dumps(self.record)
