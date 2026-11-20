@@ -69,4 +69,4 @@ Each JSONL line contains one case with `id`, `category`, `prompt`, `baseline`, a
 
 [Design decisions and FAQ](docs/design-decisions.md) · [Review rubric](docs/rubric.md)
 
-MIT licensed. Built by [Tavia](https://github.com/tavialaw7).
+MIT licensed. Built by [Tavia](https://github.com/tavialaw7). See also [AI Compute Trends](https://github.com/tavialaw7/ai-compute-trends), a SQL and Python analysis of Epoch AI's notable models dataset.
