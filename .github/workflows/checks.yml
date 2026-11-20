@@ -1,0 +1,29 @@
+name: Checks
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run unit and integration tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify the example still blocks release
+        shell: bash
+        run: |
+          set +e
+          python -m eval_review data/example.jsonl --enforce-gate
+          status=$?
+          set -e
+          test "$status" -eq 1
+          test -s build/index.html
+          test -s build/report.json

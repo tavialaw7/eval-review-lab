@@ -1,0 +1,1768 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eval Review Lab</title>
+  <style>:root {
+  color-scheme: light;
+  --ink: #192722;
+  --muted: #52635a;
+  --line: #d8e2dc;
+  --green: #246048;
+  --red: #9b3d2c;
+  --paper: #f4f7f2;
+  font-family: "Open Sans", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font-size: 15px; line-height: 1.55; }
+.shell { width: min(1120px, calc(100% - 48px)); margin: auto; }
+.header { background: #142c23; color: #f1f8f0; }
+.header-inner { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.brand { font-weight: 750; display: flex; align-items: center; gap: 11px; }
+.mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: #c9eb90; color: #183426; font-size: 19px; }
+nav { display: flex; flex-wrap: wrap; gap: 18px; }
+nav a { color: #e2eee4; text-decoration: none; font-size: .89rem; }
+nav a:hover { text-decoration: underline; }
+a:focus-visible, summary:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #328b68; outline-offset: 3px; }
+.hero { padding: 42px 0 26px; display: grid; grid-template-columns: 1fr minmax(240px, 340px); align-items: end; gap: 25px; }
+.eyebrow { font: 700 .72rem system-ui, sans-serif; letter-spacing: .13em; color: var(--green); }
+h1, h2, p { margin: 0; }
+h1 { font: 600 clamp(2.55rem, 6.2vw, 4.35rem)/1.05 Georgia, serif; letter-spacing: -.045em; margin: 9px 0 11px; }
+h2 { font-size: 1.32rem; letter-spacing: -.025em; margin-bottom: 3px; }
+.muted { color: var(--muted); }
+.decision { background: #fff0e8; border: 1px solid #ebcabb; padding: 15px 18px; border-radius: 12px; }
+.decision .eyebrow { color: var(--red); }
+.decision strong { display: block; font-size: 1.28rem; margin: 3px 0; }
+.decision p:last-child { color: #67483d; font-size: .85rem; }
+.decision.passed { background: #e6f4e5; border-color: #bcdcc3; }
+.decision.passed .eyebrow, .decision.passed p:last-child { color: #2b5e47; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.metric, .panel { background: white; border: 1px solid var(--line); border-radius: 12px; }
+.metric { padding: 15px 17px; }
+.metric strong { display: block; font-size: 1.9rem; line-height: 1.2; margin: 5px 0; font-variant-numeric: tabular-nums; letter-spacing: -.05em; }
+.metric small { color: var(--muted); }
+.panel { padding: 22px; margin-top: 17px; scroll-margin-top: 16px; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; min-width: 585px; border-collapse: collapse; margin-top: 13px; font-variant-numeric: tabular-nums; }
+th, td { border-bottom: 1px solid var(--line); padding: 10px 12px; text-align: left; }
+thead th { color: var(--muted); background: #f2f6f1; font-size: .81rem; }
+tbody tr:last-child > * { border-bottom: 0; }
+.rate { display: flex; align-items: center; gap: 8px; }
+meter { width: 66px; height: 12px; accent-color: var(--green); }
+meter::-webkit-meter-bar { border: 0; background: #e7eee8; }
+meter::-webkit-meter-optimum-value { background: #599275; }
+.up { color: var(--green); }
+.down { color: var(--red); }
+.filters { display: flex; align-items: end; flex-wrap: wrap; gap: 12px 17px; margin: 16px 0 9px; }
+.filters label { font-size: .85rem; font-weight: 650; }
+select { display: block; font: inherit; color: var(--ink); background: #fbfcfa; border: 1px solid #b8c8bd; border-radius: 7px; padding: 8px 12px; margin-top: 3px; max-width: 100%; }
+.check { display: flex; align-items: center; padding: 8px 0; gap: 5px; }
+#count { font-size: .83rem; margin: 8px 0; }
+.case { border-top: 1px solid var(--line); }
+summary { padding: 11px 0; cursor: pointer; }
+summary strong { margin: 0 7px; }
+.tag { display: inline-block; margin: 0 0 0 8px; border-radius: 100px; padding: 2px 9px; font-size: .77rem; background: #eef2ee; }
+.tag.down { background: #fff0e8; }
+.tag.up { background: #e9f5e9; }
+.case-body { padding: 0 10px 15px; }
+.prompt { white-space: pre-wrap; margin: 5px 0 13px; }
+.case-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.variant { background: #f6f8f5; border-radius: 8px; padding: 13px; overflow-wrap: anywhere; }
+.variant h3 { margin: 0 0 5px; font-size: .95rem; }
+.response { white-space: pre-wrap; }
+.reviews { list-style: none; padding: 0; margin-bottom: 0; }
+.reviews li { border-top: 1px solid var(--line); padding: 8px 0 3px; }
+.reviews small { display: block; color: var(--muted); }
+footer { padding: 18px 0 30px; font-size: .82rem; }
+@media (max-width: 720px) {
+  .hero, .case-grid { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .hero { padding-top: 29px; }
+}
+@media (max-width: 420px) {
+  .shell { width: calc(100% - 28px); }
+  .panel { padding: 15px; }
+  .header-inner { flex-wrap: wrap; padding: 12px 0; gap: 6px; }
+  nav { width: 100%; }
+}
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="shell header-inner">
+      <div class="brand"><span class="mark" aria-hidden="true">▦</span> Eval Review Lab</div>
+      <nav aria-label="Report sections"><a href="#comparison">Comparison</a><a href="#case-review">Case review</a></nav>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="title">
+      <div>
+        <p class="eyebrow">MODEL QUALITY REPORT</p>
+        <h1 id="title">Release evaluation</h1>
+        <p id="summary" class="muted"></p>
+      </div>
+      <aside class="decision" aria-label="Release gate">
+        <p class="eyebrow">RELEASE GATE</p>
+        <strong id="gate-status"></strong>
+        <p id="gate-detail"></p>
+      </aside>
+    </section>
+    <section id="metrics" class="metrics" aria-label="Key metrics"></section>
+    <section class="panel" id="comparison" aria-labelledby="comparison-title">
+      <h2 id="comparison-title">Performance by category</h2>
+      <p class="muted">Responses pass when both reviewers mark them as passing.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th scope="col">Category</th><th scope="col">Cases</th><th scope="col">Baseline</th><th scope="col">Candidate</th><th scope="col">Change</th><th scope="col">Regressions</th></tr></thead>
+          <tbody id="categories"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel" id="case-review" aria-labelledby="case-title">
+      <h2 id="case-title">Case review</h2>
+      <p class="muted">Open a case to see both responses, rubric scores and reviewer notes.</p>
+      <div class="filters">
+        <label>Outcome <select id="outcome"><option value="all">All outcomes</option><option value="regression">Regression</option><option value="improvement">Improvement</option><option value="unchanged_pass">Both pass</option><option value="unchanged_fail">Both fail</option></select></label>
+        <label>Category <select id="category"><option value="">All categories</option></select></label>
+        <label class="check"><input type="checkbox" id="split"> Reviewer disagreement only</label>
+      </div>
+      <p id="count" class="muted" role="status"></p>
+      <div id="cases"></div>
+    </section>
+    <footer class="muted" id="method"></footer>
+  </main>
+  <script type="application/json" id="report-data">{
+  "overall": {
+    "cases": 24,
+    "baseline_passes": 13,
+    "candidate_passes": 18,
+    "delta_pp": 20.833333333333332,
+    "improvements": 9,
+    "regressions": 4,
+    "disagreements": 2,
+    "agreement_rate": 0.9583333333333334,
+    "cohens_kappa": 0.9064327485380118,
+    "paired_p_value": 0.2668457031250002
+  },
+  "categories": {
+    "Arithmetic": {
+      "cases": 6,
+      "baseline_passes": 3,
+      "candidate_passes": 4,
+      "delta_pp": 16.666666666666668,
+      "improvements": 2,
+      "regressions": 1,
+      "disagreements": 0,
+      "agreement_rate": 1.0
+    },
+    "Extraction": {
+      "cases": 6,
+      "baseline_passes": 3,
+      "candidate_passes": 4,
+      "delta_pp": 16.666666666666668,
+      "improvements": 2,
+      "regressions": 1,
+      "disagreements": 1,
+      "agreement_rate": 0.9166666666666666
+    },
+    "Formatting": {
+      "cases": 6,
+      "baseline_passes": 3,
+      "candidate_passes": 5,
+      "delta_pp": 33.333333333333336,
+      "improvements": 3,
+      "regressions": 1,
+      "disagreements": 0,
+      "agreement_rate": 1.0
+    },
+    "Grounding": {
+      "cases": 6,
+      "baseline_passes": 4,
+      "candidate_passes": 5,
+      "delta_pp": 16.666666666666668,
+      "improvements": 2,
+      "regressions": 1,
+      "disagreements": 1,
+      "agreement_rate": 0.9166666666666666
+    }
+  },
+  "gate": {
+    "max_regressions": 0,
+    "min_delta_pp": 0,
+    "passed": false
+  },
+  "cases": [
+    {
+      "id": "ER-001",
+      "category": "Arithmetic",
+      "prompt": "A reviewer earns $32/hour and works 7.5 hours. Give the gross total.",
+      "baseline": {
+        "response": "$224",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Seven and a half hours at $32 is $240."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Seven and a half hours at $32 is $240."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "$240",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-001",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-002",
+      "category": "Arithmetic",
+      "prompt": "Out of 40 cases, 6 failed. What percent passed?",
+      "baseline": {
+        "response": "85%",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Thirty-four of forty cases passed."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Thirty-four of forty cases passed."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "85%",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Thirty-four of forty cases passed."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Thirty-four of forty cases passed."
+          }
+        ]
+      },
+      "case_id": "ER-002",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-003",
+      "category": "Arithmetic",
+      "prompt": "Convert 2.25 hours to minutes.",
+      "baseline": {
+        "response": "135 minutes",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "125 minutes",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Two hours plus a quarter hour is 135 minutes."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Two hours plus a quarter hour is 135 minutes."
+          }
+        ]
+      },
+      "case_id": "ER-003",
+      "baseline_pass": 1,
+      "candidate_pass": 0,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-004",
+      "category": "Arithmetic",
+      "prompt": "A pass rate rises from 60% to 75%. Give the change in percentage points.",
+      "baseline": {
+        "response": "25 percentage points",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Subtract the two displayed rates."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Subtract the two displayed rates."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "15 percentage points",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-004",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-005",
+      "category": "Arithmetic",
+      "prompt": "Split a $48.60 bill equally among three people.",
+      "baseline": {
+        "response": "$16.20 per person",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The split is correct and clearly stated."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The split is correct and clearly stated."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "$16.20 each",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The split is correct and clearly stated."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The split is correct and clearly stated."
+          }
+        ]
+      },
+      "case_id": "ER-005",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-006",
+      "category": "Arithmetic",
+      "prompt": "Three reviewers each review 12 cases. One case was reviewed by all three, and all other cases were reviewed once. How many unique cases are there?",
+      "baseline": {
+        "response": "33",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The shared case contributes two extra counts, so 34 cases are unique."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The shared case contributes two extra counts, so 34 cases are unique."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "36",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The shared case contributes two extra counts, so 34 cases are unique."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The shared case contributes two extra counts, so 34 cases are unique."
+          }
+        ]
+      },
+      "case_id": "ER-006",
+      "baseline_pass": 0,
+      "candidate_pass": 0,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-007",
+      "category": "Extraction",
+      "prompt": "From 'Invoice 412: received April 8; due April 22', return the due date.",
+      "baseline": {
+        "response": "April 8",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The due date is April 22."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The due date is April 22."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "April 22",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-007",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-008",
+      "category": "Extraction",
+      "prompt": "From 'West: closed; East: open; North: pending', give the open region.",
+      "baseline": {
+        "response": "East",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "East is explicitly listed as open."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "East is explicitly listed as open."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "East",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "East is explicitly listed as open."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "East is explicitly listed as open."
+          }
+        ]
+      },
+      "case_id": "ER-008",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-009",
+      "category": "Extraction",
+      "prompt": "Read 'Priority: High; Owner: Maya; Status: Blocked'. Return the owner only.",
+      "baseline": {
+        "response": "Maya",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "Owner: Maya",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 4,
+              "clarity": 5
+            },
+            "note": "The correct owner is clear despite the extra label."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 3,
+              "clarity": 5
+            },
+            "note": "The owner is right, but the prompt asks for the name only."
+          }
+        ]
+      },
+      "case_id": "ER-009",
+      "baseline_pass": 1,
+      "candidate_pass": 0,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 1
+    },
+    {
+      "id": "ER-010",
+      "category": "Extraction",
+      "prompt": "From '12 submitted, 9 passed, 2 failed, 1 pending', return the pending count.",
+      "baseline": {
+        "response": "2",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The record lists one pending case."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The record lists one pending case."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "1",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-010",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-011",
+      "category": "Extraction",
+      "prompt": "The deadline list reads 'QA Tue; Release Fri'. What day is Release?",
+      "baseline": {
+        "response": "Friday",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both forms identify the correct day."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both forms identify the correct day."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "Fri",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both forms identify the correct day."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both forms identify the correct day."
+          }
+        ]
+      },
+      "case_id": "ER-011",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-012",
+      "category": "Extraction",
+      "prompt": "From 'A: 12; B: 12; C: 9', give all labels tied for the highest value.",
+      "baseline": {
+        "response": "A",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both A and B must be included."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both A and B must be included."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "B",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both A and B must be included."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both A and B must be included."
+          }
+        ]
+      },
+      "case_id": "ER-012",
+      "baseline_pass": 0,
+      "candidate_pass": 0,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-013",
+      "category": "Formatting",
+      "prompt": "Return an array of strings containing red and blue, in that order. Output JSON only.",
+      "baseline": {
+        "response": "red, blue",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "The requested output is a valid JSON array."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "The requested output is a valid JSON array."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "[\"red\", \"blue\"]",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-013",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-014",
+      "category": "Formatting",
+      "prompt": "Return a single lowercase word meaning the opposite of 'on'.",
+      "baseline": {
+        "response": "off",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The answer meets the one-word and lowercase constraints."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The answer meets the one-word and lowercase constraints."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "off",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The answer meets the one-word and lowercase constraints."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The answer meets the one-word and lowercase constraints."
+          }
+        ]
+      },
+      "case_id": "ER-014",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-015",
+      "category": "Formatting",
+      "prompt": "Give the ISO date for March 5, 2026. Output the date only.",
+      "baseline": {
+        "response": "2026-03-05",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "The ISO date is 2026-03-05.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "The answer includes extra text despite the date-only instruction."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "The answer includes extra text despite the date-only instruction."
+          }
+        ]
+      },
+      "case_id": "ER-015",
+      "baseline_pass": 1,
+      "candidate_pass": 0,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-016",
+      "category": "Formatting",
+      "prompt": "Return a two-column CSV header for id and status, in that order.",
+      "baseline": {
+        "response": "status,id",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "The fields must appear in the requested order."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "The fields must appear in the requested order."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "id,status",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-016",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-017",
+      "category": "Formatting",
+      "prompt": "Label 'The meeting moved to Tuesday' as schedule or billing. Reply with the label only.",
+      "baseline": {
+        "response": "schedule",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response uses the correct label with no extra text."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response uses the correct label with no extra text."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "schedule",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response uses the correct label with no extra text."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response uses the correct label with no extra text."
+          }
+        ]
+      },
+      "case_id": "ER-017",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-018",
+      "category": "Formatting",
+      "prompt": "Return a JSON object with boolean key reviewed set to true.",
+      "baseline": {
+        "response": "{\"reviewed\":\"true\"}",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "A JSON boolean is required. A quoted value is a string."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 2,
+              "clarity": 5
+            },
+            "note": "A JSON boolean is required. A quoted value is a string."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "{\"reviewed\":true}",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-018",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-019",
+      "category": "Grounding",
+      "prompt": "Policy excerpt: 'Refund requests must arrive within 14 calendar days.' What is the deadline?",
+      "baseline": {
+        "response": "14 calendar days",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The exact time window matches the excerpt."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The exact time window matches the excerpt."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "14 calendar days",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The exact time window matches the excerpt."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The exact time window matches the excerpt."
+          }
+        ]
+      },
+      "case_id": "ER-019",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-020",
+      "category": "Grounding",
+      "prompt": "Status note: 'The build is complete. Security review is pending.' Can the team say security review is complete?",
+      "baseline": {
+        "response": "Yes, the build is complete.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The build and security review have different statuses."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The build and security review have different statuses."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "No. The security review is still pending.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-020",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-021",
+      "category": "Grounding",
+      "prompt": "Order note: 'Package shipped June 12.' What date did it arrive?",
+      "baseline": {
+        "response": "June 12",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The note gives a ship date only."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 2,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The note gives a ship date only."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "The arrival date is unspecified.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "case_id": "ER-021",
+      "baseline_pass": 0,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-022",
+      "category": "Grounding",
+      "prompt": "Policy excerpt: 'Managers approve stipends above $100.' Who approves a $90 stipend?",
+      "baseline": {
+        "response": "The excerpt does not specify.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Meets the requested output and matches the expected answer."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "A manager probably approves it.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 4,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The wording signals uncertainty, which this reviewer accepted."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "fail",
+            "scores": {
+              "accuracy": 3,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The excerpt does not establish the approval rule for $90."
+          }
+        ]
+      },
+      "case_id": "ER-022",
+      "baseline_pass": 1,
+      "candidate_pass": 0,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 1
+    },
+    {
+      "id": "ER-023",
+      "category": "Grounding",
+      "prompt": "Note: 'Jamie will send the agenda. Pat will reserve the room.' Who reserves the room?",
+      "baseline": {
+        "response": "Pat",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response matches the stated assignment."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response matches the stated assignment."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "Pat",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response matches the stated assignment."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "The response matches the stated assignment."
+          }
+        ]
+      },
+      "case_id": "ER-023",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    },
+    {
+      "id": "ER-024",
+      "category": "Grounding",
+      "prompt": "Release note: 'Dark mode is available on desktop only.' Is it available on mobile?",
+      "baseline": {
+        "response": "No. Desktop only.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both responses reflect the stated platform limit."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both responses reflect the stated platform limit."
+          }
+        ]
+      },
+      "candidate": {
+        "response": "No, it\u2019s available on desktop.",
+        "reviews": [
+          {
+            "reviewer": "reviewer-a",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both responses reflect the stated platform limit."
+          },
+          {
+            "reviewer": "reviewer-b",
+            "verdict": "pass",
+            "scores": {
+              "accuracy": 5,
+              "instruction_following": 5,
+              "clarity": 5
+            },
+            "note": "Both responses reflect the stated platform limit."
+          }
+        ]
+      },
+      "case_id": "ER-024",
+      "baseline_pass": 1,
+      "candidate_pass": 1,
+      "baseline_disagreement": 0,
+      "candidate_disagreement": 0
+    }
+  ]
+}</script>
+  <script>"use strict";
+
+const report = JSON.parse(document.querySelector("#report-data").textContent);
+const get = (id) => document.getElementById(id);
+const rate = (fraction) => `${(100 * fraction).toFixed(1)}%`;
+const delta = (value) => `${value > 0 ? "+" : ""}${value.toFixed(1)} pp`;
+
+function element(tag, text, style) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (style) node.className = style;
+  return node;
+}
+
+const overall = report.overall;
+const gate = report.gate;
+get("summary").textContent = `${overall.cases} paired cases across ${Object.keys(report.categories).length} categories.`;
+get("gate-status").textContent = gate.passed ? "Within thresholds" : "Release blocked";
+get("gate-status").parentElement.classList.toggle("passed", gate.passed);
+get("gate-detail").textContent = `At most ${gate.max_regressions} regressions · Pass-rate change of at least ${delta(gate.min_delta_pp)}`;
+
+const metrics = [
+  ["Baseline pass rate", rate(overall.baseline_passes / overall.cases), `${overall.baseline_passes} of ${overall.cases} passed`],
+  ["Candidate pass rate", rate(overall.candidate_passes / overall.cases), `${delta(overall.delta_pp)} vs. baseline`],
+  ["Regressions", overall.regressions, `${overall.improvements} improved`],
+  ["Reviewer agreement", rate(overall.agreement_rate), `${overall.disagreements} split decisions`],
+];
+for (const [label, value, detail] of metrics) {
+  const card = element("article", undefined, "metric");
+  card.append(element("p", label), element("strong", value), element("small", detail));
+  get("metrics").append(card);
+}
+
+function rateCell(passes, count) {
+  const cell = element("td");
+  const chart = element("div", undefined, "rate");
+  const bar = element("meter");
+  bar.min = 0;
+  bar.max = 1;
+  bar.value = passes / count;
+  bar.setAttribute("aria-hidden", "true");
+  chart.append(bar, element("span", rate(passes / count)));
+  cell.append(chart);
+  return cell;
+}
+
+for (const [name, stats] of Object.entries(report.categories)) {
+  const row = element("tr");
+  const label = element("th", name);
+  label.scope = "row";
+  row.append(label, element("td", stats.cases),
+    rateCell(stats.baseline_passes, stats.cases), rateCell(stats.candidate_passes, stats.cases),
+    element("td", delta(stats.delta_pp), stats.delta_pp > 0 ? "up" : stats.delta_pp < 0 ? "down" : ""),
+    element("td", stats.regressions));
+  get("categories").append(row);
+  const option = element("option", name);
+  option.value = name;
+  get("category").append(option);
+}
+
+function outcome(row) {
+  if (row.baseline_pass) return row.candidate_pass ? "unchanged_pass" : "regression";
+  return row.candidate_pass ? "improvement" : "unchanged_fail";
+}
+
+const labels = {
+  regression: "Regression", improvement: "Improvement",
+  unchanged_pass: "Both pass", unchanged_fail: "Both fail",
+};
+
+function variant(row, side) {
+  const block = element("section", undefined, "variant");
+  const decision = row[`${side}_pass`] ? "Pass" : "Fail";
+  block.append(element("h3", `${side === "baseline" ? "Baseline" : "Candidate"} · ${decision}`),
+    element("p", row[side].response, "response"));
+  const list = element("ul", undefined, "reviews");
+  for (const review of row[side].reviews) {
+    const item = element("li");
+    const scores = review.scores;
+    item.append(
+      element("strong", `${review.reviewer} · ${review.verdict}`),
+      element("small", `Accuracy ${scores.accuracy}/5 · Instructions ${scores.instruction_following}/5 · Clarity ${scores.clarity}/5`),
+      element("p", review.note),
+    );
+    list.append(item);
+  }
+  block.append(list);
+  return block;
+}
+
+function caseDetails(row, result) {
+  const details = element("details", undefined, "case");
+  const title = element("summary");
+  const color = result === "regression" ? " down" : result === "improvement" ? " up" : "";
+  title.append(element("strong", row.id), element("span", row.category),
+    element("span", labels[result], `tag${color}`));
+  if (row.baseline_disagreement || row.candidate_disagreement) {
+    title.append(element("span", "Split review", "tag"));
+  }
+  const body = element("div", undefined, "case-body");
+  const pair = element("div", undefined, "case-grid");
+  pair.append(variant(row, "baseline"), variant(row, "candidate"));
+  body.append(element("strong", "Prompt"), element("p", row.prompt, "prompt"), pair);
+  details.append(title, body);
+  return details;
+}
+
+const rows = report.cases.map((row) => ({ row, result: outcome(row) }));
+
+function renderCases() {
+  const selectedOutcome = get("outcome").value;
+  const selectedCategory = get("category").value;
+  const splitOnly = get("split").checked;
+  const matching = rows.filter(({ row, result }) =>
+    (selectedOutcome === "all" || result === selectedOutcome)
+    && (!selectedCategory || row.category === selectedCategory)
+    && (!splitOnly || row.baseline_disagreement || row.candidate_disagreement));
+  get("count").textContent = `${matching.length} of ${rows.length} cases`;
+  get("cases").replaceChildren();
+  for (const { row, result } of matching) get("cases").append(caseDetails(row, result));
+  if (!matching.length) get("cases").append(element("p", "No cases match these filters."));
+}
+
+for (const id of ["outcome", "category", "split"]) get(id).addEventListener("change", renderCases);
+const kappa = overall.cohens_kappa;
+const pValue = overall.paired_p_value;
+get("method").textContent = `Cohen’s κ ${kappa === null ? "unavailable for these ratings" : kappa.toFixed(2)} · Exact McNemar p ${pValue < 0.001 ? "< 0.001" : pValue.toFixed(3)}`;
+renderCases();
+</script>
+</body>
+</html>

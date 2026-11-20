@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eval Review Lab</title>
+  <style>/* REPORT_CSS */</style>
+</head>
+<body>
+  <header class="header">
+    <div class="shell header-inner">
+      <div class="brand"><span class="mark" aria-hidden="true">▦</span> Eval Review Lab</div>
+      <nav aria-label="Report sections"><a href="#comparison">Comparison</a><a href="#case-review">Case review</a></nav>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="title">
+      <div>
+        <p class="eyebrow">MODEL QUALITY REPORT</p>
+        <h1 id="title">Release evaluation</h1>
+        <p id="summary" class="muted"></p>
+      </div>
+      <aside class="decision" aria-label="Release gate">
+        <p class="eyebrow">RELEASE GATE</p>
+        <strong id="gate-status"></strong>
+        <p id="gate-detail"></p>
+      </aside>
+    </section>
+    <section id="metrics" class="metrics" aria-label="Key metrics"></section>
+    <section class="panel" id="comparison" aria-labelledby="comparison-title">
+      <h2 id="comparison-title">Performance by category</h2>
+      <p class="muted">Responses pass when both reviewers mark them as passing.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th scope="col">Category</th><th scope="col">Cases</th><th scope="col">Baseline</th><th scope="col">Candidate</th><th scope="col">Change</th><th scope="col">Regressions</th></tr></thead>
+          <tbody id="categories"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel" id="case-review" aria-labelledby="case-title">
+      <h2 id="case-title">Case review</h2>
+      <p class="muted">Open a case to see both responses, rubric scores and reviewer notes.</p>
+      <div class="filters">
+        <label>Outcome <select id="outcome"><option value="all">All outcomes</option><option value="regression">Regression</option><option value="improvement">Improvement</option><option value="unchanged_pass">Both pass</option><option value="unchanged_fail">Both fail</option></select></label>
+        <label>Category <select id="category"><option value="">All categories</option></select></label>
+        <label class="check"><input type="checkbox" id="split"> Reviewer disagreement only</label>
+      </div>
+      <p id="count" class="muted" role="status"></p>
+      <div id="cases"></div>
+    </section>
+    <footer class="muted" id="method"></footer>
+  </main>
+  <script type="application/json" id="report-data"><!-- REPORT_DATA --></script>
+  <script>/* REPORT_JS */</script>
+</body>
+</html>
